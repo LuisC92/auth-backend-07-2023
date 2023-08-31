@@ -12,13 +12,14 @@ const hashingOptions = {
 };
 
 const hashPassword = (req, res, next) => {
-  if(req.body.newPassword !== null){
+  if(req.body.newPassword !== null && req.body.newPassword !== undefined){
     req.body.password = req.body.newPassword
   }
   argon2
     .hash(req.body.password, hashingOptions)
     .then((hashedPassword) => {
       delete req.body.password;
+
       if(req.body.newPassword !== null){
         delete req.body.newPassword
       }
@@ -41,13 +42,11 @@ const verifyPassword = (req, res, next) => {
         argon2
           .verify(user[0].hashedPassword, req.body.password)
           .then((isVerified) => {
-            console.log(isVerified);
             if (isVerified) {
               delete user[0].hashedPassword;
               req.user = user[0];
               next();
             } else {
-              console.log("HERE");
               res.status(401).send("Invalid password");
             }
           })
@@ -103,8 +102,6 @@ const verifyEmail = (req, res, next) => {
 
 const verifyToken = (req, res, next) => {
   const authorizationHeader = req.get("Authorization");
-
-  // console.log(authorizationHeader !== null);
   
   if (authorizationHeader === null) {
     res.status(403).send("Authorization header is missing");

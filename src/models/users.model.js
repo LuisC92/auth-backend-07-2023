@@ -18,6 +18,8 @@ const findUserToLogin = (email) => {
     .then(([results]) => results);
 };
 
+
+
 module.exports = {
   createNewUser,
   findUserByEmail,

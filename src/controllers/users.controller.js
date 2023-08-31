@@ -43,7 +43,31 @@ const login = (req, res) => {
   }
 };
 
+const getUserInfo = (req, res) => {
+  //* get email after middleware to verify token
+  const {email} = req.body
+
+  //* create the model to get user info by email
+  User.findUserToLogin(email)
+    .then(user => {
+      if(user[0] !== null && user[0].email === email) {
+        delete user[0].hashedPassword
+        res.status(200).send(user[0])
+      } else {
+        res.status(404).send("User not found with email: " + email)
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).send("Error retrieving user info form DB")
+    })
+
+
+
+}
+
 module.exports = {
   createUser,
   login,
+  getUserInfo,
 };
